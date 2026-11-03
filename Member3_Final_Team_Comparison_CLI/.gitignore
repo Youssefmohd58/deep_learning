@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+outputs/
+.env
+.vscode/
+
+# Large trained checkpoint is delivered inside the ZIP and should be hosted via Drive/LFS.
+team_assets/member2/*.pth

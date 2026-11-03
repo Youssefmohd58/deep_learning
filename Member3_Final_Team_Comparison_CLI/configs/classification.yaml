@@ -1,0 +1,24 @@
+# Team-aligned classification configuration for Member 3 + Member 2 comparison.
+# The public CUB-200 dataset is downloaded automatically from Hugging Face.
+seed: 42
+image_size: 224
+batch_size: 32
+num_workers: 0
+num_classes: 200
+validation_fraction: 0.20
+split_manifest: configs/train_validation_split.csv
+class_names_file: configs/class_names.json
+scratch_checkpoint: team_assets/member2/best_model.pth
+scratch_image_size: 128
+output_dir: outputs/member3
+# Original 3+3 transfer-learning protocol (not the later discarded longer training).
+head_epochs: 3
+finetune_epochs: 3
+head_lr: 0.001
+finetune_lr: 0.0001
+weight_decay: 0.0001
+label_smoothing: 0.05
+# Four grid trials and four random trials; head only, validation-based.
+tuning_epochs: 1
+tuning_train_images: 1600
+tuning_val_images: 600
