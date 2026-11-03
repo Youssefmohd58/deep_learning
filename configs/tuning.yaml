@@ -1,0 +1,18 @@
+model:
+  num_classes: 200
+
+data:
+  train_dataset: Multimodal-Fatima/CUB_train
+  test_dataset: Multimodal-Fatima/CUB_test
+  manifest_path: outputs/member1_eda/train_validation_split.csv
+  batch_size: 64
+  num_workers: 2
+
+training:
+  epochs: 3
+  learning_rate: 0.003
+  weight_decay: 0.05
+  seed: 42
+
+outputs:
+  directory: outputs/tuning_current
