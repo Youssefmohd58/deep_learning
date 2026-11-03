@@ -1,0 +1,57 @@
+{
+  "original_train": 5994,
+  "official_test": 5794,
+  "train_count": 4795,
+  "validation_count": 1199,
+  "species": 200,
+  "image_size": 224,
+  "batch_size": 32,
+  "flagged_images": 137,
+  "image_review_decisions": {
+    "pending": 137
+  },
+  "caption_cleaning": {
+    "image_records": 5994,
+    "original_captions": 59940,
+    "cleaned_captions": 59300,
+    "duplicate_captions_removed": 639,
+    "incomplete_captions_removed": 1,
+    "cleaned_vocabulary_size": 4067,
+    "review_flags": 584
+  },
+  "duplicate_audit": {
+    "exact_duplicate_groups": 1,
+    "cross_split_groups_after_fix": 0,
+    "decoding_failures": [],
+    "duplicate_groups": [
+      [
+        [
+          "original_train",
+          1712
+        ],
+        [
+          "original_train",
+          1731
+        ]
+      ]
+    ],
+    "split_repairs": []
+  },
+  "full_loader_verification": {
+    "training": {
+      "passed": true,
+      "images": 4795,
+      "batches": 150
+    },
+    "validation": {
+      "passed": true,
+      "images": 1199,
+      "batches": 38
+    },
+    "test": {
+      "passed": true,
+      "images": 5794,
+      "batches": 182
+    }
+  }
+}
