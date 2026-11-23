@@ -20,6 +20,16 @@ from src.utils.config import checkpoint_dir, output_dir
 from src.utils.seed import get_device
 
 
+def _relative(path) -> str:
+    """Path relative to the project root when possible (keeps personal folders out of committed results)."""
+    from src.utils.config import PROJECT_ROOT
+
+    try:
+        return Path(path).resolve().relative_to(PROJECT_ROOT).as_posix()
+    except ValueError:
+        return Path(path).name
+
+
 def default_checkpoints(cfg: dict, model: str = 'all') -> list[Path]:
     """checkpoints/<arch>_best.pt for each requested model; the legacy 128px scratch model too, if present."""
     folder = checkpoint_dir(cfg)
@@ -71,7 +81,7 @@ def evaluate_checkpoint(cfg: dict, path, data: dict, gradcam_per_kind: int = 4, 
     record = {'tag': loaded.tag, 'model': loaded.display_name, 'architecture': loaded.architecture,
               'image_size': loaded.image_size, **metrics,
               'best_val_accuracy': loaded.meta.get('best_val_accuracy'),
-              'checkpoint': str(path),
+              'checkpoint': _relative(path),
               'checkpoint_sha256': hashlib.sha256(Path(path).read_bytes()).hexdigest(),
               'split_sha256': current_split,
               'split_hash_stored_in_checkpoint': bool(trained_split)}
