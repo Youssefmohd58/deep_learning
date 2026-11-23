@@ -171,7 +171,7 @@
     "images_with_issues": 601
   },
   "split": {
-    "manifest": "C:\\Users\\ASH\\deep learning project\\deep_learning\\data\\splits\\train_validation_split.csv",
+    "manifest": "data/splits/train_validation_split.csv",
     "sha256": "4da0624b7b8bdc0a1a54aaf039e7b12fc029652ef158fb1a20c1c762288d3469",
     "train": 4795,
     "validation": 1199,

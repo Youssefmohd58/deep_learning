@@ -93,7 +93,7 @@ def run_eda(cfg: dict, data: dict, verify_loaders: bool = True, verbose: bool = 
     log('samples and augmentation previews done')
 
     # 5. Split and DataLoader verification
-    summary['split'] = {'manifest': str(manifest_path(cfg)), 'sha256': split_hash, 'train': len(train_ids),
+    summary['split'] = {'manifest': str(cfg['data']['split_manifest']), 'sha256': split_hash, 'train': len(train_ids),
                         'validation': len(val_ids), 'test': len(test),
                         'stratified_all_200_species_in_each': True}
     if verify_loaders:
