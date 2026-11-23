@@ -1,0 +1,19 @@
+# Hyperparameter search for the scratch CNN (spec 5.8: Grid Search AND Random Search).
+# Run on a GPU (Colab T4):  python -m src.cli tune --config configs/tuning_scratch_cnn.yaml
+# Each trial trains a fresh model with `tuning.epochs` epochs on the train split and is scored on
+# the validation split only (never the test split). The old 3-epoch search reached only ~2-3%
+# accuracy, too early to tell settings apart, so trials now run long enough to separate them.
+base: scratch_cnn.yaml
+
+tuning:
+  epochs: 15
+  max_train_images: null     # full training split
+  max_val_images: null
+  grid:                      # every combination: 2 x 2 = 4 trials
+    lr: [0.001, 0.003]
+    weight_decay: [0.01, 0.05]
+  random:                    # same number of trials, sampled from continuous ranges
+    trials: 4
+    space:
+      lr: {log_uniform: [0.0003, 0.006]}
+      weight_decay: {log_uniform: [0.005, 0.1]}

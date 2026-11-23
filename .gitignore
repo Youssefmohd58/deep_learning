@@ -1,9 +1,10 @@
-# Byte-compiled / optimized / DLL files
+# Byte-compiled / caches
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
 
-# Jupyter Notebook
+# Jupyter
 .ipynb_checkpoints
 
 # Virtual environments
@@ -12,9 +13,21 @@ __pycache__/
 env/
 venv/
 
-# OS / Editor
+# OS / editor
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
 
+# Trained models are shared through Google Drive, never committed (see README)
+checkpoints/
+*.pt
+*.pth
+
+# Large or regenerable outputs. Small figures/metrics under outputs/ may be committed.
+outputs/mlflow.db
+outputs/mlartifacts/
+outputs/**/predictions/
+outputs/**/*.npy
+outputs/eda/cache/
+outputs/smoke/

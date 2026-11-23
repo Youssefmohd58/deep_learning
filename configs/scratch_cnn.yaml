@@ -1,0 +1,19 @@
+# Member 2: 5-block CNN trained completely from scratch (the baseline required by spec 5.5).
+base: data.yaml
+
+model:
+  architecture: scratch_cnn
+  dropout: 0.5
+
+data:
+  augmentation: scratch_strong  # a from-scratch model needs heavy augmentation to generalise
+  batch_size: 64                # use 32 if a T4 runs out of memory at 224px
+
+training:
+  strategy: scratch             # every layer trains; AdamW + OneCycle schedule
+  epochs: 80
+  lr: 0.003                     # peak OneCycle learning rate
+  weight_decay: 0.05
+  label_smoothing: 0.1
+  grad_clip: 1.0
+  checkpoint_name: scratch_cnn_best.pt
