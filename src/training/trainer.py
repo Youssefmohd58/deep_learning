@@ -28,7 +28,8 @@ def _plain(obj):
 
 
 def train_model(cfg: dict, data: dict | None = None, tracker=None, save: bool = True,
-                run_name: str | None = None, nested: bool = False, verbose: bool = True) -> dict:
+                run_name: str | None = None, nested: bool = False, verbose: bool = True,
+                output_group: str = 'training') -> dict:
     """Train the model described by ``cfg``; returns a summary (best scores, paths, history)."""
     tracker = tracker or NullTracker()
     seed_everything(int(cfg.get('seed', 42)))
@@ -45,7 +46,7 @@ def train_model(cfg: dict, data: dict | None = None, tracker=None, save: bool = 
     scaler = torch.amp.GradScaler('cuda', enabled=device.type == 'cuda')
     stages = stages_for(cfg)
     run_name = run_name or f'{arch}_{loaders.image_size}px'
-    out = output_dir(cfg, 'training', run_name)
+    out = output_dir(cfg, output_group, run_name)
 
     if verbose:
         print(f'Device: {device} | model: {arch} | {parameter_count(model):,} parameters | '
