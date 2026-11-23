@@ -1,0 +1,21 @@
+true_id,true_species,predicted_id,predicted_species,count,fraction_of_true_class
+111,Great Grey Shrike,110,Loggerhead Shrike,13,0.43333333333333335
+28,American Crow,29,Fish Crow,10,0.3333333333333333
+144,Elegant Tern,142,Caspian Tern,10,0.3333333333333333
+142,Caspian Tern,144,Elegant Tern,10,0.3333333333333333
+106,Common Raven,28,American Crow,8,0.26666666666666666
+154,Warbling Vireo,152,Philadelphia Vireo,8,0.26666666666666666
+36,Acadian Flycatcher,42,Yellow bellied Flycatcher,8,0.27586206896551724
+70,Long tailed Jaeger,71,Pomarine Jaeger,7,0.23333333333333334
+181,Yellow Warbler,179,Wilson Warbler,7,0.23333333333333334
+129,Tree Sparrow,117,House Sparrow,7,0.23333333333333334
+143,Common Tern,145,Forsters Tern,7,0.23333333333333334
+0,Black footed Albatross,2,Sooty Albatross,7,0.23333333333333334
+2,Sooty Albatross,0,Black footed Albatross,7,0.25
+107,White necked Raven,29,Fish Crow,7,0.23333333333333334
+104,Whip poor Will,21,Chuck will Widow,7,0.3684210526315789
+124,Lincoln Sparrow,128,Song Sparrow,7,0.2413793103448276
+125,Nelson Sharp tailed Sparrow,123,Le Conte Sparrow,7,0.23333333333333334
+116,Clay colored Sparrow,114,Brewer Sparrow,7,0.2413793103448276
+58,California Gull,61,Herring Gull,6,0.2
+114,Brewer Sparrow,116,Clay colored Sparrow,6,0.20689655172413793

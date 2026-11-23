@@ -1,0 +1,18 @@
+{
+  "tag": "scratch_cnn_legacy128",
+  "model": "Scratch CNN (128px)",
+  "architecture": "scratch_cnn",
+  "image_size": 128,
+  "samples": 5794,
+  "accuracy": 0.6234035208836728,
+  "precision_macro": 0.625961612904208,
+  "recall_macro": 0.6244884487157429,
+  "f1_macro": 0.6193455571421651,
+  "f1_weighted": 0.6193298684934561,
+  "top5_accuracy": 0.860027614773904,
+  "best_val_accuracy": 0.6005004170141784,
+  "checkpoint": "C:\\Users\\ASH\\deep learning project\\deep_learning\\checkpoints\\scratch_cnn_legacy128.pth",
+  "checkpoint_sha256": "61019671700955e85ec3a2e0964a47df61ab82aa21f0938237da06ddd2a5f0c6",
+  "split_sha256": "4da0624b7b8bdc0a1a54aaf039e7b12fc029652ef158fb1a20c1c762288d3469",
+  "split_hash_stored_in_checkpoint": false
+}

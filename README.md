@@ -75,7 +75,24 @@ Quick CPU smoke test of training (a few minutes): `python -m src.cli train --con
 
 ## 3. Results
 
-RESULTS_PLACEHOLDER
+Official CUB-200-2011 test set, 5,794 images, produced by `evaluate` / `compare` / `benchmark` from the
+current checkpoints (`outputs/comparison/model_comparison.md`):
+
+| Model | Input | Test acc | Top-5 | Macro F1 | Val acc |
+|---|---|---|---|---|---|
+| Scratch CNN (legacy checkpoint) | 128px | 62.34% | 86.00% | 61.93% | 60.05% |
+| ResNet-18, transfer | 224px | 67.54% | 91.13% | 67.35% | 63.72% |
+| EfficientNet-B0, transfer | 224px | **76.34%** | **94.34%** | **76.24%** | 74.23% |
+
+- **Pretraining helps:** EfficientNet-B0 beats the scratch CNN by 14 points of accuracy. The scratch row
+  will be replaced by the 224px retrain (`train --config configs/scratch_cnn.yaml --use-tuned` on Colab).
+- **Most-confused species** are near-identical pairs, e.g. Forster's vs Common Tern, Chipping vs Tree Sparrow
+  (`outputs/evaluation/<model>/most_confused_pairs.csv`).
+- **Grad-CAM** (`outputs/evaluation/<model>/gradcam_correct_vs_wrong.png`): correct predictions focus on the
+  head, bill and plumage pattern. Wrong ones often focus on the wrong body region or the background. Some
+  "wrong" Red-headed Woodpecker images look like Red-bellied Woodpeckers, possibly label noise worth checking.
+- **Benchmark** (`outputs/benchmark/`): published methods reach 84.1–91.7% using 448px inputs and larger or
+  specialised backbones. `benchmark_notes.md` explains the gap.
 
 ---
 
@@ -135,8 +152,9 @@ new encoder can be swapped in without changing the training loop (spec 5.2).
 - **CPU vs GPU:** the 224px retraining of the scratch CNN and the tuning runs need a GPU (Colab). Until the
   scratch CNN is retrained, its results come from the **legacy 128px checkpoint**, so the scratch-vs-transfer
   comparison still mixes 128px and 224px inputs.
-- **137 flagged images** (dark, low contrast or small) are listed for manual review in `outputs/eda/review/`;
-  none were removed automatically.
+- **299 flagged images** (train + test: small, dark, low-contrast or grey-scale) are listed for manual review
+  in `outputs/eda/review/`; none were removed automatically.
+- Training on a CPU is impractical: one scratch-CNN epoch on just 400 images took about 3 minutes on a laptop CPU.
 - **Published benchmark numbers** in `configs/benchmark.yaml` were collected from the papers' arXiv versions
   and must be double-checked by the team; they use 448px inputs and larger backbones (see
   `outputs/benchmark/benchmark_notes.md`).

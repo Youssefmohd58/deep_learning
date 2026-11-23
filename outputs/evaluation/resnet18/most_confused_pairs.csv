@@ -1,0 +1,21 @@
+true_id,true_species,predicted_id,predicted_species,count,fraction_of_true_class
+183,Louisiana Waterthrush,182,Northern Waterthrush,14,0.4666666666666667
+115,Chipping Sparrow,129,Tree Sparrow,13,0.43333333333333335
+24,Pelagic Cormorant,22,Brandt Cormorant,12,0.4
+58,California Gull,63,Ring billed Gull,12,0.4
+143,Common Tern,145,Forsters Tern,11,0.36666666666666664
+21,Chuck will Widow,104,Whip poor Will,11,0.4230769230769231
+144,Elegant Tern,142,Caspian Tern,11,0.36666666666666664
+154,Warbling Vireo,152,Philadelphia Vireo,11,0.36666666666666664
+49,Eared Grebe,50,Horned Grebe,10,0.3333333333333333
+36,Acadian Flycatcher,42,Yellow bellied Flycatcher,10,0.3448275862068966
+198,Winter Wren,195,House Wren,10,0.3333333333333333
+135,Barn Swallow,136,Cliff Swallow,9,0.3
+53,Blue Grosbeak,13,Indigo Bunting,8,0.26666666666666666
+106,Common Raven,28,American Crow,8,0.26666666666666666
+70,Long tailed Jaeger,71,Pomarine Jaeger,8,0.26666666666666666
+61,Herring Gull,63,Ring billed Gull,8,0.26666666666666666
+58,California Gull,65,Western Gull,8,0.26666666666666666
+146,Least Tern,145,Forsters Tern,8,0.26666666666666666
+29,Fish Crow,28,American Crow,8,0.26666666666666666
+171,Nashville Warbler,172,Orange crowned Warbler,7,0.23333333333333334
