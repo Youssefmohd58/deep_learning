@@ -1,0 +1,19 @@
+{
+  "exact_duplicate_groups": 1,
+  "cross_split_groups": 0,
+  "groups": [
+    [
+      {
+        "source": "train",
+        "row_index": 1712,
+        "split": "train"
+      },
+      {
+        "source": "train",
+        "row_index": 1731,
+        "split": "train"
+      }
+    ]
+  ],
+  "cross_split": []
+}

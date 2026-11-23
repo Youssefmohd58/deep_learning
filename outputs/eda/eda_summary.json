@@ -1,0 +1,199 @@
+{
+  "images": {
+    "train_original": 5994,
+    "test_official": 5794
+  },
+  "species": 200,
+  "class_balance": {
+    "train_min": 29,
+    "train_max": 30,
+    "train_mean": 29.97,
+    "imbalance_ratio_max_over_min": 1.03,
+    "test_min": 11,
+    "test_max": 30
+  },
+  "image_quality": {
+    "corrupted_files": 0,
+    "flagged_for_review": 299,
+    "flag_reasons": {
+      "smaller than 224px": 148,
+      "low contrast": 110,
+      "very dark": 33,
+      "mode L": 8
+    },
+    "width": {
+      "count": 11788.0,
+      "mean": 467.9,
+      "std": 63.9,
+      "min": 121.0,
+      "25%": 495.0,
+      "50%": 500.0,
+      "75%": 500.0,
+      "max": 500.0
+    },
+    "height": {
+      "count": 11788.0,
+      "mean": 386.0,
+      "std": 70.9,
+      "min": 120.0,
+      "25%": 333.0,
+      "50%": 375.0,
+      "75%": 434.0,
+      "max": 500.0
+    },
+    "smaller_than_224": 148,
+    "non_rgb_modes": {
+      "RGB": 11780,
+      "L": 8
+    }
+  },
+  "duplicates": {
+    "exact_duplicate_groups": 1,
+    "cross_split_groups": 0
+  },
+  "missing_data": [
+    {
+      "split": "train",
+      "rows": 5994,
+      "missing_or_empty": {
+        "label": 0,
+        "description": 0,
+        "file_name": 0,
+        "id": 0
+      }
+    },
+    {
+      "split": "test",
+      "rows": 5794,
+      "missing_or_empty": {
+        "label": 0,
+        "description": 0,
+        "file_name": 0,
+        "id": 0
+      }
+    }
+  ],
+  "captions_train": {
+    "raw_captions": 59940,
+    "clean_captions": 59300,
+    "duplicates_removed": 639,
+    "fragments_removed": 1,
+    "images": 5994,
+    "vocabulary_raw": 4067,
+    "vocabulary_clean": 4067,
+    "words_per_caption": {
+      "count": 59300.0,
+      "mean": 15.32,
+      "std": 4.7,
+      "min": 3.0,
+      "25%": 12.0,
+      "50%": 14.0,
+      "75%": 17.0,
+      "max": 66.0
+    },
+    "captions_per_image_after_cleaning": {
+      "7": 1,
+      "8": 54,
+      "9": 529,
+      "10": 5410
+    },
+    "words_seen_once": 1867,
+    "images_with_issues": 584,
+    "typo_candidates": 508,
+    "typo_examples": [
+      [
+        "birdh",
+        "bird"
+      ],
+      [
+        "lbird",
+        "bird"
+      ],
+      [
+        "birdi",
+        "bird"
+      ],
+      [
+        "birid",
+        "bird"
+      ],
+      [
+        "birdy",
+        "bird"
+      ],
+      [
+        "wiwth",
+        "with"
+      ],
+      [
+        "dwith",
+        "with"
+      ],
+      [
+        "wirth",
+        "with"
+      ],
+      [
+        "whith",
+        "with"
+      ],
+      [
+        "withw",
+        "with"
+      ]
+    ]
+  },
+  "captions_test": {
+    "raw_captions": 57940,
+    "clean_captions": 57272,
+    "duplicates_removed": 667,
+    "fragments_removed": 1,
+    "images": 5794,
+    "vocabulary_raw": 3944,
+    "vocabulary_clean": 3944,
+    "words_per_caption": {
+      "count": 57272.0,
+      "mean": 15.3,
+      "std": 4.64,
+      "min": 4.0,
+      "25%": 12.0,
+      "50%": 14.0,
+      "75%": 17.0,
+      "max": 63.0
+    },
+    "captions_per_image_after_cleaning": {
+      "7": 3,
+      "8": 61,
+      "9": 537,
+      "10": 5193
+    },
+    "words_seen_once": 1786,
+    "images_with_issues": 601
+  },
+  "split": {
+    "manifest": "data/splits/train_validation_split.csv",
+    "sha256": "4da0624b7b8bdc0a1a54aaf039e7b12fc029652ef158fb1a20c1c762288d3469",
+    "train": 4795,
+    "validation": 1199,
+    "test": 5794,
+    "stratified_all_200_species_in_each": true
+  },
+  "loader_verification": {
+    "image_size": 224,
+    "train": {
+      "passed": true,
+      "images": 4795,
+      "batches": 150
+    },
+    "validation": {
+      "passed": true,
+      "images": 1199,
+      "batches": 38
+    },
+    "test": {
+      "passed": true,
+      "images": 5794,
+      "batches": 182
+    }
+  }
+}

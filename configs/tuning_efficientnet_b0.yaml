@@ -1,0 +1,16 @@
+# Hyperparameter search for EfficientNet-B0 transfer learning (same search space as ResNet-18).
+# Run:  python -m src.cli tune --config configs/tuning_efficientnet_b0.yaml
+base: efficientnet_b0.yaml
+
+tuning:
+  epochs: 2
+  max_train_images: null
+  max_val_images: null
+  grid:
+    head_lr: [0.0003, 0.001, 0.003]
+    weight_decay: [0.0, 0.0001]
+  random:
+    trials: 6
+    space:
+      head_lr: {log_uniform: [0.0001, 0.005]}
+      weight_decay: {log_uniform: [0.000001, 0.001]}

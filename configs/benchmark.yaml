@@ -1,0 +1,60 @@
+# Published CUB-200-2011 results used for benchmarking (spec section 5.11).
+# All use the official CUB-200-2011 split (5,994 train / 5,794 test) and top-1 accuracy,
+# the same split and headline metric as this project. Numbers were collected on the web;
+# the team must check every value against the paper before putting it in the report.
+published:
+  - model: ResNet-50 fine-tuned (baseline)
+    accuracy: 0.845
+    backbone: ResNet-50, ImageNet-pretrained
+    input_size: 448
+    extra_annotations: false
+    source: Yang et al., "Learning to Navigate for Fine-grained Classification" (NTS-Net), ECCV 2018 - baseline row
+    url: https://arxiv.org/abs/1809.00287
+    note: Reported as the plain ResNet-50 baseline in the NTS-Net paper (which resizes images to 448x448).
+
+  - model: Bilinear CNN (B-CNN)
+    accuracy: 0.841
+    backbone: two VGG networks, ImageNet-pretrained, outer-product pooling
+    input_size: null           # not checked; read it from the paper before citing
+    extra_annotations: false
+    source: Lin, RoyChowdhury & Maji, "Bilinear CNN Models for Fine-grained Visual Recognition", ICCV 2015
+    url: https://arxiv.org/abs/1504.07889
+    note: 84.1% is from the revised arXiv versions; the first preprint (v1) reported lower numbers.
+
+  - model: NTS-Net
+    accuracy: 0.875
+    backbone: ResNet-50 + part-region navigator
+    input_size: 448
+    extra_annotations: false
+    source: Yang et al., ECCV 2018
+    url: https://arxiv.org/abs/1809.00287
+    note: K=4 informative regions.
+
+  - model: ViT-B/16 fine-tuned
+    accuracy: 0.903
+    backbone: Vision Transformer ViT-B/16, ImageNet-21k pretrained
+    input_size: 448
+    extra_annotations: false
+    source: 'He et al., "TransFG: A Transformer Architecture for Fine-grained Recognition", AAAI 2022 - comparison table'
+    url: https://arxiv.org/abs/2103.07976
+
+  - model: TransFG
+    accuracy: 0.917
+    backbone: ViT-B/16, ImageNet-21k pretrained, overlapping patches
+    input_size: 448
+    extra_annotations: false
+    source: He et al., AAAI 2022
+    url: https://arxiv.org/abs/2103.07976
+
+# Open-source models we considered running ourselves, and why we did not (kept for the report).
+not_run:
+  - model: AshProg/bird-classifier-convnext (ConvNeXt-Base, Hugging Face)
+    url: https://huggingface.co/AshProg/bird-classifier-convnext
+    reason: Train/test split and label order are not documented, so it may have been trained on our test
+      images and its class IDs may not match ours. Weights are a full pickled model (.pth), which can run
+      arbitrary code when loaded.
+  - model: zwe-zwe/CUB-200 (ConvNeXt-Tiny, Hugging Face)
+    url: https://huggingface.co/zwe-zwe/CUB-200
+    reason: Trained on a different, assignment-specific split (4,829 train / 1,204 test) whose overlap with the
+      official test set is unknown, so scoring it on our test set could be inflated by test images it was
+      trained on. Pickle-based checkpoint.

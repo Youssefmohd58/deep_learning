@@ -1,0 +1,21 @@
+true_id,true_species,predicted_id,predicted_species,count,fraction_of_true_class
+145,Forsters Tern,143,Common Tern,12,0.4
+115,Chipping Sparrow,129,Tree Sparrow,11,0.36666666666666664
+178,Tennessee Warbler,172,Orange crowned Warbler,9,0.3103448275862069
+70,Long tailed Jaeger,71,Pomarine Jaeger,9,0.3
+142,Caspian Tern,144,Elegant Tern,9,0.3
+130,Vesper Sparrow,126,Savannah Sparrow,8,0.26666666666666666
+26,Shiny Cowbird,48,Boat tailed Grackle,7,0.23333333333333334
+66,Anna Hummingbird,67,Ruby throated Hummingbird,7,0.23333333333333334
+36,Acadian Flycatcher,38,Least Flycatcher,7,0.2413793103448276
+58,California Gull,65,Western Gull,7,0.23333333333333334
+143,Common Tern,140,Artic Tern,7,0.23333333333333334
+67,Ruby throated Hummingbird,66,Anna Hummingbird,7,0.23333333333333334
+143,Common Tern,145,Forsters Tern,7,0.23333333333333334
+140,Artic Tern,143,Common Tern,7,0.2413793103448276
+21,Chuck will Widow,104,Whip poor Will,7,0.2692307692307692
+10,Rusty Blackbird,26,Shiny Cowbird,6,0.2
+102,Sayornis,101,Western Wood Pewee,6,0.2
+111,Great Grey Shrike,110,Loggerhead Shrike,6,0.2
+58,California Gull,63,Ring billed Gull,6,0.2
+110,Loggerhead Shrike,111,Great Grey Shrike,6,0.2

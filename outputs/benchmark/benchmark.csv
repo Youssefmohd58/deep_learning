@@ -1,0 +1,9 @@
+model,accuracy,input_size,backbone,extra_annotations,source,url,f1_macro
+TransFG,0.917,448.0,"ViT-B/16, ImageNet-21k pretrained, overlapping patches",False,"He et al., AAAI 2022",https://arxiv.org/abs/2103.07976,
+ViT-B/16 fine-tuned,0.903,448.0,"Vision Transformer ViT-B/16, ImageNet-21k pretrained",False,"He et al., ""TransFG: A Transformer Architecture for Fine-grained Recognition"", AAAI 2022 - comparison table",https://arxiv.org/abs/2103.07976,
+NTS-Net,0.875,448.0,ResNet-50 + part-region navigator,False,"Yang et al., ECCV 2018",https://arxiv.org/abs/1809.00287,
+ResNet-50 fine-tuned (baseline),0.845,448.0,"ResNet-50, ImageNet-pretrained",False,"Yang et al., ""Learning to Navigate for Fine-grained Classification"" (NTS-Net), ECCV 2018 - baseline row",https://arxiv.org/abs/1809.00287,
+Bilinear CNN (B-CNN),0.841,,"two VGG networks, ImageNet-pretrained, outer-product pooling",False,"Lin, RoyChowdhury & Maji, ""Bilinear CNN Models for Fine-grained Visual Recognition"", ICCV 2015",https://arxiv.org/abs/1504.07889,
+EfficientNet-B0 (224px),0.7633759061097687,224.0,efficientnet_b0,False,this project,,0.762411142871893
+ResNet-18 (224px),0.6753538142906454,224.0,resnet18,False,this project,,0.6735396311673411
+Scratch CNN (128px),0.6234035208836728,128.0,scratch_cnn,False,this project,,0.6193455571421651

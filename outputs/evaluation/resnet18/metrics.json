@@ -1,0 +1,18 @@
+{
+  "tag": "resnet18",
+  "model": "ResNet-18 (224px)",
+  "architecture": "resnet18",
+  "image_size": 224,
+  "samples": 5794,
+  "accuracy": 0.6753538142906454,
+  "precision_macro": 0.6925294946402808,
+  "recall_macro": 0.677877654166181,
+  "f1_macro": 0.6735396311673411,
+  "f1_weighted": 0.6725648194393573,
+  "top5_accuracy": 0.9112875388332758,
+  "best_val_accuracy": 0.6371976647206005,
+  "checkpoint": "checkpoints/resnet18_best.pt",
+  "checkpoint_sha256": "85b096e59dd0eb16f86d8fb431b9dbc85928c3f858cddf02617072d6becb80c9",
+  "split_sha256": "4da0624b7b8bdc0a1a54aaf039e7b12fc029652ef158fb1a20c1c762288d3469",
+  "split_hash_stored_in_checkpoint": true
+}

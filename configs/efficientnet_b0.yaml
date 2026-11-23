@@ -1,0 +1,9 @@
+# Member 3: ImageNet-pretrained EfficientNet-B0 with a new 200-class head.
+# Stage 1 trains only the new head; stage 2 also unfreezes the last two feature blocks.
+base: resnet18.yaml
+
+model:
+  architecture: efficientnet_b0
+
+training:
+  checkpoint_name: efficientnet_b0_best.pt

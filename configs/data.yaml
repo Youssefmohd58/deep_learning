@@ -1,0 +1,25 @@
+# Shared settings inherited by every model config (via `base: data.yaml`).
+# Changing a value here changes it for all models, which keeps comparisons fair.
+seed: 42
+
+project:
+  output_dir: outputs          # figures, metrics, MLflow store
+  checkpoint_dir: checkpoints  # trained models (gitignored; shared via Google Drive)
+  experiment: cub200_milestone1
+
+tracking:
+  enabled: true                # MLflow; disable for a run with --no-mlflow
+
+data:
+  train_dataset: Multimodal-Fatima/CUB_train
+  test_dataset: Multimodal-Fatima/CUB_test
+  split_manifest: data/splits/train_validation_split.csv   # fixed team split, never regenerated silently
+  class_names_file: configs/class_names.json
+  num_classes: 200
+  validation_fraction: 0.20    # only used when creating a brand-new split
+  image_size: 224              # one input size for every model (see docs/preprocessing_decisions.md)
+  augmentation: transfer_mild  # recipe name from src/data/transforms.py
+  batch_size: 32
+  num_workers: 0               # 0 is safest on Windows; 2-4 on Colab/Linux
+  max_train_images: null       # set a number for quick smoke tests (stratified subset)
+  max_val_images: null

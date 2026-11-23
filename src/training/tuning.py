@@ -1,382 +1,133 @@
+"""Hyperparameter tuning with Grid Search and Random Search (spec section 5.8).
 
-import csv
+Both methods search the same hyperparameters for the same model, are given the same
+per-trial budget (epochs, data) and are scored on the validation split only. The run
+writes every trial, a method comparison (best score, number of trials, total time),
+a plot, and ``best_params.yaml`` that ``train --use-tuned`` applies.
+"""
+from __future__ import annotations
+
 import itertools
 import math
 import random
-import time
-from pathlib import Path
-
-import numpy as np
-import torch
-import torch.nn as nn
-
-from src.data.cub_data import make_classification_loaders
-from src.models.bird_cnn import BirdCNN
-
-
-SEED = 42
-NUM_CLASSES = 200
-WEIGHT_DECAY = 0.05
-LABEL_SMOOTHING = 0.1
-
-OUTPUT_DIR = Path("outputs/tuning_current")
-RESULTS_PATH = OUTPUT_DIR / "tuning_results.csv"
-
-FIELDS = [
-    "method",
-    "trial",
-    "learning_rate",
-    "batch_size",
-    "epochs",
-    "best_epoch",
-    "best_val_accuracy",
-    "duration_seconds",
-]
-
-
-def set_seed(seed):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
-
-
-def run_trial(
-    train_hf,
-    test_hf,
-    manifest_path,
-    learning_rate,
-    batch_size,
-    epochs,
-    device,
-):
-    # Give every configuration the same starting seed.
-    set_seed(SEED)
-
-    train_loader, val_loader, _ = make_classification_loaders(
-        train_hf,
-        test_hf,
-        manifest_path=manifest_path,
-        batch_size=batch_size,
-        num_workers=0,
-        seed=SEED,
-    )
-
-    # Fresh CNN for every experiment.
-    model = BirdCNN(num_classes=NUM_CLASSES).to(device)
-
-    criterion = nn.CrossEntropyLoss(
-        label_smoothing=LABEL_SMOOTHING
-    )
-
-    optimizer = torch.optim.AdamW(
-        model.parameters(),
-        lr=learning_rate,
-        weight_decay=WEIGHT_DECAY,
-    )
-
-    scheduler = torch.optim.lr_scheduler.OneCycleLR(
-        optimizer,
-        max_lr=learning_rate,
-        epochs=epochs,
-        steps_per_epoch=len(train_loader),
-    )
-
-    use_amp = device.type == "cuda"
-
-    scaler = torch.amp.GradScaler(
-        "cuda",
-        enabled=use_amp,
-    )
-
-    best_val_accuracy = -1.0
-    best_epoch = 0
-
-    start = time.perf_counter()
-
-    for epoch in range(epochs):
-
-        # ---------------------------
-        # Training
-        # ---------------------------
-        model.train()
-
-        train_correct = 0
-        train_total = 0
-        train_loss_sum = 0.0
-
-        for batch in train_loader:
-            images = batch["image"].to(device)
-            labels = batch["label"].to(device)
-
-            optimizer.zero_grad(set_to_none=True)
-
-            with torch.autocast(
-                device_type=device.type,
-                enabled=use_amp,
-            ):
-                outputs = model(images)
-                loss = criterion(outputs, labels)
-
-            if use_amp:
-                scaler.scale(loss).backward()
-                scaler.unscale_(optimizer)
-
-                torch.nn.utils.clip_grad_norm_(
-                    model.parameters(),
-                    max_norm=1.0,
-                )
-
-                scaler.step(optimizer)
-                scaler.update()
-            else:
-                loss.backward()
-
-                torch.nn.utils.clip_grad_norm_(
-                    model.parameters(),
-                    max_norm=1.0,
-                )
-
-                optimizer.step()
-
-            scheduler.step()
-
-            count = labels.size(0)
-
-            train_loss_sum += loss.item() * count
-            train_correct += (
-                outputs.argmax(dim=1) == labels
-            ).sum().item()
-            train_total += count
-
-        train_loss = train_loss_sum / train_total
-        train_accuracy = (
-            100.0 * train_correct / train_total
-        )
-
-        # ---------------------------
-        # Validation
-        # ---------------------------
-        model.eval()
-
-        val_correct = 0
-        val_total = 0
-        val_loss_sum = 0.0
-
-        with torch.no_grad():
-            for batch in val_loader:
-                images = batch["image"].to(device)
-                labels = batch["label"].to(device)
-
-                with torch.autocast(
-                    device_type=device.type,
-                    enabled=use_amp,
-                ):
-                    outputs = model(images)
-                    loss = criterion(outputs, labels)
-
-                count = labels.size(0)
-
-                val_loss_sum += loss.item() * count
-                val_correct += (
-                    outputs.argmax(dim=1) == labels
-                ).sum().item()
-                val_total += count
-
-        val_loss = val_loss_sum / val_total
-        val_accuracy = (
-            100.0 * val_correct / val_total
-        )
-
-        print(
-            f"Epoch {epoch + 1}/{epochs} | "
-            f"Train Loss: {train_loss:.4f} | "
-            f"Train Acc: {train_accuracy:.2f}% | "
-            f"Val Loss: {val_loss:.4f} | "
-            f"Val Acc: {val_accuracy:.2f}%",
-            flush=True,
-        )
-
-        if val_accuracy > best_val_accuracy:
-            best_val_accuracy = val_accuracy
-            best_epoch = epoch + 1
-
-    duration = time.perf_counter() - start
-
-    del model, optimizer, scheduler, scaler
-    del train_loader, val_loader
-
-    if use_amp:
-        torch.cuda.empty_cache()
-
-    return best_val_accuracy, best_epoch, duration
-
-
-def save_results(results):
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    with open(RESULTS_PATH, "w", newline="") as f:
-        writer = csv.DictWriter(
-            f,
-            fieldnames=FIELDS,
-        )
-        writer.writeheader()
-        writer.writerows(results)
-
-
-def run_tuning(
-    train_hf,
-    test_hf,
-    manifest_path,
-    epochs=3,
-):
-    device = torch.device(
-        "cuda" if torch.cuda.is_available()
-        else "cpu"
-    )
-
-    set_seed(SEED)
-
-    print("Device:", device)
-    print("Epochs per trial:", epochs)
-
-    if epochs < 1:
-        raise ValueError("epochs must be at least 1")
-
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    results = []
-
-    # ---------------------------
-    # Grid Search
-    # ---------------------------
-    grid_configs = list(
-        itertools.product(
-            [0.001, 0.003],
-            [32, 64],
-        )
-    )
-
-    # ---------------------------
-    # Random Search
-    # ---------------------------
-    rng = random.Random(SEED)
-
-    random_configs = []
-
-    for _ in range(4):
-        lr = math.exp(
-            rng.uniform(
-                math.log(0.0001),
-                math.log(0.003),
-            )
-        )
-
-        batch_size = rng.choice([32, 64])
-
-        random_configs.append(
-            (lr, batch_size)
-        )
-
-    experiments = [
-        ("grid", grid_configs),
-        ("random", random_configs),
-    ]
-
-    # Save an empty CSV with the correct header.
-    save_results(results)
-
-    # ---------------------------
-    # Run all experiments
-    # ---------------------------
-    for method, configurations in experiments:
-
-        print("\n" + "=" * 50)
-        print(method.upper(), "SEARCH")
-        print("=" * 50)
-
-        for trial, (lr, batch_size) in enumerate(
-            configurations,
-            start=1,
-        ):
-            print(
-                f"\n{method.upper()} trial {trial}: "
-                f"LR={lr:.6f}, "
-                f"Batch Size={batch_size}",
-                flush=True,
-            )
-
-            accuracy, best_epoch, duration = run_trial(
-                train_hf=train_hf,
-                test_hf=test_hf,
-                manifest_path=manifest_path,
-                learning_rate=lr,
-                batch_size=batch_size,
-                epochs=epochs,
-                device=device,
-            )
-
-            result = {
-                "method": method,
-                "trial": trial,
-                "learning_rate": round(lr, 8),
-                "batch_size": batch_size,
-                "epochs": epochs,
-                "best_epoch": best_epoch,
-                "best_val_accuracy": round(
-                    accuracy, 4
-                ),
-                "duration_seconds": round(
-                    duration, 2
-                ),
-            }
-
-            results.append(result)
-
-            # Save progress after every completed trial.
-            save_results(results)
-
-            print(
-                f"Best Val Acc: {accuracy:.2f}% | "
-                f"Duration: {duration:.1f}s",
-                flush=True,
-            )
-
-    # ---------------------------
-    # Compare methods
-    # ---------------------------
-    print("\n" + "=" * 50)
-    print("FINAL TUNING COMPARISON")
-    print("=" * 50)
-
-    for method in ["grid", "random"]:
-        subset = [
-            row for row in results
-            if row["method"] == method
-        ]
-
-        best = max(
-            subset,
-            key=lambda row: row["best_val_accuracy"],
-        )
-
-        total_time = sum(
-            row["duration_seconds"]
-            for row in subset
-        )
-
-        print(
-            f"\n{method.upper()} BEST:\n"
-            f"Accuracy: {best['best_val_accuracy']:.2f}%\n"
-            f"Learning rate: {best['learning_rate']}\n"
-            f"Batch size: {best['batch_size']}\n"
-            f"Best epoch: {best['best_epoch']}\n"
-            f"Trials: {len(subset)}\n"
-            f"Total time: {total_time:.1f}s"
-        )
-
-    print("\nResults saved to:", RESULTS_PATH)
-
-    return results
+
+import pandas as pd
+
+from src.data.hf import load_cub
+from src.training.trainer import train_model
+from src.utils.config import apply_overrides, output_dir, project_path, save_yaml
+from src.utils.tracking import NullTracker
+
+
+def grid_trials(grid: dict) -> list[dict]:
+    """Every combination of the listed values."""
+    keys = list(grid)
+    return [dict(zip(keys, values)) for values in itertools.product(*(grid[k] for k in keys))]
+
+
+def _sample(spec, rng: random.Random):
+    if isinstance(spec, list):
+        return rng.choice(spec)
+    if 'log_uniform' in spec:
+        low, high = spec['log_uniform']
+        return math.exp(rng.uniform(math.log(low), math.log(high)))
+    if 'uniform' in spec:
+        return rng.uniform(*spec['uniform'])
+    if 'choice' in spec:
+        return rng.choice(spec['choice'])
+    raise ValueError(f'Unknown search-space spec {spec!r}; use log_uniform, uniform, choice or a list')
+
+
+def random_trials(space: dict, trials: int, seed: int = 42) -> list[dict]:
+    rng = random.Random(seed)
+    return [{key: _sample(spec, rng) for key, spec in space.items()} for _ in range(int(trials))]
+
+
+def trial_config(cfg: dict, params: dict) -> dict:
+    """Config for one trial: the searched values plus the shorter tuning budget."""
+    tuning = cfg['tuning']
+    overrides = [f'training.{k}={v}' for k, v in params.items()]
+    if cfg['training']['strategy'] == 'scratch':
+        overrides.append(f'training.epochs={tuning["epochs"]}')
+    else:  # transfer: tune the head stage, skip fine-tuning to keep trials comparable and cheap
+        overrides += [f'training.head_epochs={tuning["epochs"]}', 'training.finetune_epochs=0']
+    for key in ('max_train_images', 'max_val_images'):
+        if tuning.get(key) is not None:
+            overrides.append(f'data.{key}={tuning[key]}')
+    return apply_overrides(cfg, overrides)
+
+
+def _python_value(value):
+    """NumPy scalar -> plain Python number so it can be written to YAML."""
+    return value.item() if hasattr(value, 'item') else value
+
+
+def best_params_path(cfg: dict):
+    return output_dir(cfg, 'tuning', cfg['model']['architecture']) / 'best_params.yaml'
+
+
+def run_search(cfg: dict, methods=('grid', 'random'), data=None, tracker=None, verbose=True) -> dict:
+    if 'tuning' not in cfg:
+        raise ValueError('This config has no tuning section; use configs/tuning_<model>.yaml')
+    tracker = tracker or NullTracker()
+    arch = cfg['model']['architecture']
+    data = data or load_cub(cfg, ('train',))
+    plans = {'grid': grid_trials(cfg['tuning']['grid']),
+             'random': random_trials(cfg['tuning']['random']['space'], cfg['tuning']['random']['trials'],
+                                     int(cfg.get('seed', 42)))}
+    out = output_dir(cfg, 'tuning', arch)
+    rows = []
+    with tracker.run(f'tuning_{arch}', tags={'architecture': arch, 'kind': 'tuning'}):
+        tracker.log_params({'methods': list(methods), 'trial_epochs': cfg['tuning']['epochs'],
+                            'grid': cfg['tuning']['grid'], 'random_space': cfg['tuning']['random']['space']})
+        for method in methods:
+            for trial, params in enumerate(plans[method], 1):
+                if verbose:
+                    shown = ', '.join(f'{k}={v:.3g}' if isinstance(v, float) else f'{k}={v}' for k, v in params.items())
+                    print(f'\n[{method} search] trial {trial}/{len(plans[method])}: {shown}', flush=True)
+                summary = train_model(trial_config(cfg, params), data=data, tracker=tracker, save=False,
+                                      run_name=f'tune_{arch}_{method}_{trial:02d}', nested=True,
+                                      verbose=verbose, output_group='tuning_runs')
+                rows.append({'method': method, 'trial': trial, **params,
+                             'best_val_accuracy': summary['best_val_accuracy'],
+                             'best_val_loss': summary['best_val_loss'], 'best_epoch': summary['best_epoch'],
+                             'duration_seconds': summary['duration_seconds']})
+                pd.DataFrame(rows).to_csv(out / 'trials.csv', index=False)  # save progress after each trial
+
+        trials = pd.DataFrame(rows)
+        comparison = (trials.groupby('method', sort=False)
+                      .agg(best_val_accuracy=('best_val_accuracy', 'max'),
+                           mean_val_accuracy=('best_val_accuracy', 'mean'),
+                           trials=('trial', 'count'), total_seconds=('duration_seconds', 'sum'))
+                      .reset_index())
+        comparison.to_csv(out / 'grid_vs_random.csv', index=False)
+        best_row = trials.sort_values(['best_val_accuracy', 'best_val_loss'], ascending=[False, True]).iloc[0]
+        searched = list(cfg['tuning']['grid']) + [k for k in cfg['tuning']['random']['space']
+                                                  if k not in cfg['tuning']['grid']]
+        best = {k: _python_value(best_row[k]) for k in searched}
+        save_yaml(out / 'best_params.yaml', {'architecture': arch, 'found_by': str(best_row['method']),
+                                             'best_val_accuracy': float(best_row['best_val_accuracy']),
+                                             'training': best})
+        from src.visualization.plots import plot_tuning
+        plot = plot_tuning(trials, out / 'grid_vs_random.png')
+        for name in ('trials.csv', 'grid_vs_random.csv', 'best_params.yaml'):
+            tracker.log_artifact(out / name)
+        tracker.log_artifact(plot)
+        tracker.log_metrics({f'{r.method}_best_val_accuracy': r.best_val_accuracy for r in comparison.itertuples()})
+    if verbose:
+        print('\nGrid vs random search:\n' + comparison.to_string(index=False))
+        print(f'Best: {best} ({best_row["method"]}, val acc {best_row["best_val_accuracy"]:.2%}) -> {out / "best_params.yaml"}')
+    return {'trials': trials, 'comparison': comparison, 'best': best, 'output_dir': out}
+
+
+def apply_tuned(cfg: dict, path=None) -> dict:
+    """Return ``cfg`` with the tuned training values from best_params.yaml applied."""
+    import yaml
+
+    path = project_path(path) if path else best_params_path(cfg)
+    if not path.is_file():
+        raise FileNotFoundError(f'No tuning results at {path}. Run `python -m src.cli tune` first.')
+    tuned = yaml.safe_load(path.read_text(encoding='utf-8'))
+    if tuned.get('architecture') != cfg['model']['architecture']:
+        raise ValueError(f'{path} was tuned for {tuned.get("architecture")}, not {cfg["model"]["architecture"]}')
+    return apply_overrides(cfg, [f'training.{k}={v}' for k, v in tuned['training'].items()])
