@@ -1,0 +1,21 @@
+true_id,true_species,predicted_id,predicted_species,count,fraction_of_true_class
+111,Great Grey Shrike,110,Loggerhead Shrike,10,0.3333333333333333
+198,Winter Wren,195,House Wren,9,0.3
+183,Louisiana Waterthrush,182,Northern Waterthrush,9,0.3
+91,Nighthawk,104,Whip poor Will,9,0.3
+145,Forsters Tern,143,Common Tern,9,0.3
+102,Sayornis,101,Western Wood Pewee,8,0.26666666666666666
+144,Elegant Tern,142,Caspian Tern,8,0.26666666666666666
+143,Common Tern,145,Forsters Tern,8,0.26666666666666666
+106,Common Raven,28,American Crow,7,0.23333333333333334
+104,Whip poor Will,21,Chuck will Widow,7,0.3684210526315789
+143,Common Tern,140,Artic Tern,7,0.23333333333333334
+101,Western Wood Pewee,39,Olive sided Flycatcher,7,0.23333333333333334
+142,Caspian Tern,144,Elegant Tern,7,0.23333333333333334
+65,Western Gull,59,Glaucous winged Gull,7,0.23333333333333334
+36,Acadian Flycatcher,42,Yellow bellied Flycatcher,7,0.2413793103448276
+176,Prothonotary Warbler,160,Blue winged Warbler,7,0.23333333333333334
+129,Tree Sparrow,117,House Sparrow,7,0.23333333333333334
+36,Acadian Flycatcher,38,Least Flycatcher,7,0.2413793103448276
+107,White necked Raven,106,Common Raven,7,0.23333333333333334
+125,Nelson Sharp tailed Sparrow,123,Le Conte Sparrow,6,0.2

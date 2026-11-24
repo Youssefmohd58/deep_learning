@@ -13,13 +13,14 @@
 | ViT-B/16 fine-tuned | 90.3% | 448px | He et al., "TransFG: A Transformer Architecture for Fine-grained Recognition", AAAI 2022 - comparison table |
 | NTS-Net | 87.5% | 448px | Yang et al., ECCV 2018 |
 | ResNet-50 fine-tuned (baseline) | 84.5% | 448px | Yang et al., "Learning to Navigate for Fine-grained Classification" (NTS-Net), ECCV 2018 - baseline row |
-| Bilinear CNN (B-CNN) | 84.1% | see paper | Lin, RoyChowdhury & Maji, "Bilinear CNN Models for Fine-grained Visual Recognition", ICCV 2015 |
-| EfficientNet-B0 (224px) | 76.3% | 224px | this project |
+| Bilinear CNN (B-CNN) | 84.1% | 448px | Lin, RoyChowdhury & Maji, "Bilinear CNN Models for Fine-grained Visual Recognition", ICCV 2015 |
+| EfficientNet-B0 (224px) | 76.0% | 224px | this project |
 | ResNet-18 (224px) | 67.5% | 224px | this project |
 | Scratch CNN (128px) | 62.3% | 128px | this project |
+| Scratch CNN (224px) | 62.1% | 224px | this project |
 
 ## Why our numbers differ
-- Our best model (EfficientNet-B0 (224px)) reaches 76.3%. The plain fine-tuned ResNet-50 baseline in the literature reaches 84.5%.
+- Our best model (EfficientNet-B0 (224px)) reaches 76.0%. The plain fine-tuned ResNet-50 baseline in the literature reaches 84.5%.
 - **Input resolution:** the published methods use 448x448 images; we use 224x224 (4x fewer pixels), which loses the small details that separate similar species.
 - **Model size:** ResNet-50 / ViT-B are much larger than our ResNet-18, EfficientNet-B0 and the 5-block scratch CNN.
 - **Training budget:** our transfer models train for only 3 + 3 epochs and fine-tune just the last stage; published baselines fine-tune the whole network for many epochs.

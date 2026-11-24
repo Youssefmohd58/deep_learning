@@ -1,0 +1,6 @@
+architecture: scratch_cnn
+found_by: random
+best_val_accuracy: 0.09591326105087573
+training:
+  lr: 0.0006838213367137885
+  weight_decay: 0.009758293360302322

@@ -1,0 +1,18 @@
+{
+  "tag": "scratch_cnn",
+  "model": "Scratch CNN (224px)",
+  "architecture": "scratch_cnn",
+  "image_size": 224,
+  "samples": 5794,
+  "accuracy": 0.6206420434932689,
+  "precision_macro": 0.6213026192623267,
+  "recall_macro": 0.6231462781828322,
+  "f1_macro": 0.6163470246273792,
+  "f1_weighted": 0.6160078862261374,
+  "top5_accuracy": 0.8612357611322057,
+  "best_val_accuracy": 0.5871559633027523,
+  "checkpoint": "checkpoints/scratch_cnn_best.pt",
+  "checkpoint_sha256": "e0cb68354f5c68bf19c9c871414ff8548db4db22839df96b8e4b171152567559",
+  "split_sha256": "4da0624b7b8bdc0a1a54aaf039e7b12fc029652ef158fb1a20c1c762288d3469",
+  "split_hash_stored_in_checkpoint": true
+}
