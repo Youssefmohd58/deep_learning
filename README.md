@@ -102,7 +102,9 @@ Official CUB-200-2011 test set, 5,794 images, all models at 224×224, trained on
   2-epoch head-only trials cannot show the benefit of weight decay. The final models therefore use the
   default configs (`outputs/tuning/<model>/` keeps every trial and the grid-vs-random comparison).
 - **Confusions** sit between near-identical species of the same family (gulls, sparrows, terns, flycatchers,
-  warblers): `outputs/evaluation/<model>/confusion_matrix.png` and `most_confused_pairs.csv`.
+  warblers). EfficientNet-B0's most frequent: Chipping → Tree Sparrow (13 of 30), Elegant → Caspian Tern (11),
+  California → Western Gull (10), Chuck-will's-widow → Whip-poor-will (10), Common → Arctic Tern (10)
+  (`outputs/evaluation/<model>/confusion_matrix.png` and `most_confused_pairs.csv`).
 - **Grad-CAM** (`outputs/evaluation/<model>/gradcam_correct_vs_wrong.png`): correct predictions focus on the
   bird's head, bill and plumage pattern, never the background. Several confident "errors" are **label
   errors in the test set**: images labelled Chipping Sparrow, Green Kingfisher and Red-headed Woodpecker
