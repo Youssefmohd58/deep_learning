@@ -29,14 +29,17 @@ downloads automatically from Hugging Face the first time a command needs it.
 ### Trained models
 
 Checkpoints are **not** in git (spec: Google Drive link). Download them from the team Drive folder
-(link in the submission archive) into `checkpoints/`:
+**<https://drive.google.com/drive/folders/1sG0Mud5-jvYyAeDz3TKZ2MTvK3r4jWFj?usp=sharing>** into `checkpoints/`:
 
 | File | Model | Input |
 |---|---|---|
+| `checkpoints/efficientnet_b0_best.pt` | EfficientNet-B0, transfer learning (**final model**) | 224px |
 | `checkpoints/resnet18_best.pt` | ResNet-18, transfer learning | 224px |
-| `checkpoints/efficientnet_b0_best.pt` | EfficientNet-B0, transfer learning | 224px |
-| `checkpoints/scratch_cnn_best.pt` | Scratch CNN retrained at 224px (after the Colab run) | 224px |
-| `checkpoints/scratch_cnn_legacy128.pth` | Scratch CNN, original Member 2 run (legacy) | 128px |
+| `checkpoints/scratch_cnn_best.pt` | Scratch CNN (baseline) | 224px |
+| `checkpoints/scratch_cnn_legacy128.pth` | Scratch CNN, original Member 2 run (legacy, for reference) | 128px |
+
+To browse every logged run, copy the team's `mlflow.db` from the Drive folder to `outputs/mlflow.db` and run
+`mlflow ui` (see Commands).
 
 Any checkpoint loads through `src/models/registry.py`, which reads the image size and class names from the
 file, so `predict`, `gradcam` and `evaluate` work with all of them.
@@ -56,16 +59,21 @@ Run `python -m src.cli <command> --help` for all options.
 | Augmentation preview | `python -m src.cli augment-preview` | `outputs/eda/06_augmentation_*.png` |
 | **Tune** scratch CNN | `python -m src.cli tune --config configs/tuning_scratch_cnn.yaml` | `outputs/tuning/scratch_cnn/` |
 | **Tune** ResNet-18 | `python -m src.cli tune --config configs/tuning_resnet18.yaml` | `outputs/tuning/resnet18/` |
-| **Train** scratch CNN | `python -m src.cli train --config configs/scratch_cnn.yaml --use-tuned` | `checkpoints/scratch_cnn_best.pt`, `outputs/training/` |
-| **Train** ResNet-18 | `python -m src.cli train --config configs/resnet18.yaml --use-tuned` | `checkpoints/resnet18_best.pt` |
+| **Train** scratch CNN | `python -m src.cli train --config configs/scratch_cnn.yaml` | `checkpoints/scratch_cnn_best.pt`, `outputs/training/` |
+| **Train** ResNet-18 | `python -m src.cli train --config configs/resnet18.yaml` | `checkpoints/resnet18_best.pt` |
 | **Train** EfficientNet-B0 | `python -m src.cli train --config configs/efficientnet_b0.yaml` | `checkpoints/efficientnet_b0_best.pt` |
 | **Evaluate** on the test set | `python -m src.cli evaluate --model all` | `outputs/evaluation/<model>/` |
 | **Compare** scratch vs transfer | `python -m src.cli compare` | `outputs/comparison/` |
 | **Benchmark** vs published | `python -m src.cli benchmark` | `outputs/benchmark/` |
-| **Predict** one image | `python -m src.cli predict --checkpoint checkpoints/resnet18_best.pt --image bird.jpg --top-k 5` | console / `--output` JSON |
-| **Grad-CAM** one image | `python -m src.cli gradcam --checkpoint checkpoints/resnet18_best.pt --image bird.jpg` | `outputs/gradcam/` |
+| **Predict** one image | `python -m src.cli predict --checkpoint checkpoints/efficientnet_b0_best.pt --image bird.jpg --top-k 5` | console / `--output` JSON |
+| **Grad-CAM** one image | `python -m src.cli gradcam --checkpoint checkpoints/efficientnet_b0_best.pt --image bird.jpg` | `outputs/gradcam/` |
 | Experiment tracking | `mlflow ui --backend-store-uri sqlite:///outputs/mlflow.db` | <http://127.0.0.1:5000> |
 | Tests | `python -m pytest -q` | console |
+
+The final models were trained **with the default settings in each config** (the `train` commands above). Add
+`--use-tuned` to train with the best settings of the last `tune` run instead
+(`outputs/tuning/<model>/best_params.yaml`); in our full-length runs those scored lower (see Results).
+On Windows with an NVIDIA GPU, add `--set data.num_workers=4` to speed up data loading.
 
 Quick CPU smoke test of training (a few minutes): `python -m src.cli train --config configs/resnet18.yaml
 --set training.head_epochs=1 --set training.finetune_epochs=0 --set data.max_train_images=400
@@ -75,24 +83,36 @@ Quick CPU smoke test of training (a few minutes): `python -m src.cli train --con
 
 ## 3. Results
 
-Official CUB-200-2011 test set, 5,794 images, produced by `evaluate` / `compare` / `benchmark` from the
-current checkpoints (`outputs/comparison/model_comparison.md`):
+Official CUB-200-2011 test set, 5,794 images, all models at 224×224, trained on an NVIDIA RTX 5060
+(`evaluate` / `compare` / `benchmark`). Checkpoints were chosen on validation accuracy only.
 
-| Model | Input | Test acc | Top-5 | Macro F1 | Val acc |
-|---|---|---|---|---|---|
-| Scratch CNN (legacy checkpoint) | 128px | 62.34% | 86.00% | 61.93% | 60.05% |
-| ResNet-18, transfer | 224px | 67.54% | 91.13% | 67.35% | 63.72% |
-| EfficientNet-B0, transfer | 224px | **76.34%** | **94.34%** | **76.24%** | 74.23% |
+| Model | Input | Test acc | Top-5 | Macro F1 | Val acc | Training |
+|---|---|---|---|---|---|---|
+| Scratch CNN | 224px | 62.06% | 86.12% | 61.63% | 58.72% | 80 epochs, 31 min |
+| ResNet-18, transfer | 224px | 67.50% | 91.35% | 67.24% | 64.72% | 3 + 3 epochs, 1.3 min |
+| **EfficientNet-B0, transfer** (final) | 224px | **75.99%** | **94.65%** | **75.76%** | **73.56%** | 3 + 3 epochs, 1.8 min |
+| *Scratch CNN, legacy checkpoint* | *128px* | *62.34%* | *86.00%* | *61.93%* | *60.05%* | *reference only* |
 
-- **Pretraining helps:** EfficientNet-B0 beats the scratch CNN by 14 points of accuracy. The scratch row
-  will be replaced by the 224px retrain (`train --config configs/scratch_cnn.yaml --use-tuned` on Colab).
-- **Most-confused species** are near-identical pairs, e.g. Forster's vs Common Tern, Chipping vs Tree Sparrow
-  (`outputs/evaluation/<model>/most_confused_pairs.csv`).
+- **Pretraining helps:** EfficientNet-B0 beats the scratch CNN by 14 points of accuracy while training for
+  6 epochs instead of 80. Going from 128px to 224px did not improve the scratch CNN, which still underfits.
+- **Tuning:** random search found a better setting than grid search for both the scratch CNN (9.59% vs 8.09%
+  after 15-epoch trials) and ResNet-18 (42.87% vs 42.04% after 2-epoch trials), with the same budget. In
+  full-length training the **default settings won** (scratch 58.72% vs 55.21%, ResNet-18 64.72% vs 61.22%
+  validation accuracy): short trials favour higher or lower learning rates than the full run needs, and
+  2-epoch head-only trials cannot show the benefit of weight decay. The final models therefore use the
+  default configs (`outputs/tuning/<model>/` keeps every trial and the grid-vs-random comparison).
+- **Confusions** sit between near-identical species of the same family (gulls, sparrows, terns, flycatchers,
+  warblers). EfficientNet-B0's most frequent: Chipping → Tree Sparrow (13 of 30), Elegant → Caspian Tern (11),
+  California → Western Gull (10), Chuck-will's-widow → Whip-poor-will (10), Common → Arctic Tern (10)
+  (`outputs/evaluation/<model>/confusion_matrix.png` and `most_confused_pairs.csv`).
 - **Grad-CAM** (`outputs/evaluation/<model>/gradcam_correct_vs_wrong.png`): correct predictions focus on the
-  head, bill and plumage pattern. Wrong ones often focus on the wrong body region or the background. Some
-  "wrong" Red-headed Woodpecker images look like Red-bellied Woodpeckers, possibly label noise worth checking.
+  bird's head, bill and plumage pattern, never the background. Several confident "errors" are **label
+  errors in the test set**: images labelled Chipping Sparrow, Green Kingfisher and Red-headed Woodpecker
+  show a Lazuli Bunting, a Pied Kingfisher and a Red-bellied Woodpecker, exactly what the models predict.
 - **Benchmark** (`outputs/benchmark/`): published methods reach 84.1–91.7% using 448px inputs and larger or
-  specialised backbones. `benchmark_notes.md` explains the gap.
+  specialised backbones; `benchmark_notes.md` explains the gap.
+
+The full write-up (EDA, experiments, tuning, MLflow screenshots, Grad-CAM analysis) is in the Milestone 1 report.
 
 ---
 
@@ -149,9 +169,12 @@ new encoder can be swapped in without changing the training loop (spec 5.2).
 
 ## 6. Known limitations
 
-- **CPU vs GPU:** the 224px retraining of the scratch CNN and the tuning runs need a GPU (Colab). Until the
-  scratch CNN is retrained, its results come from the **legacy 128px checkpoint**, so the scratch-vs-transfer
-  comparison still mixes 128px and 224px inputs.
+- **Single runs:** every configuration was trained once (seed 42), so differences of 1–2 points are within
+  run-to-run noise. The validation split has only about 6 images per species.
+- **Tuning trials** were shorter than the final training and did not include the fine-tune stage of the
+  transfer models; the fine-tune learning rate was not tuned.
+- **Test labels** contain some errors (see Grad-CAM above); the official labels are kept so the benchmark
+  stays comparable.
 - **299 flagged images** (train + test: small, dark, low-contrast or grey-scale) are listed for manual review
   in `outputs/eda/review/`; none were removed automatically.
 - Training on a CPU is impractical: one scratch-CNN epoch on just 400 images took about 3 minutes on a laptop CPU.
@@ -161,6 +184,6 @@ new encoder can be swapped in without changing the training loop (spec 5.2).
 
 ## 7. Team
 
-- **Member 1** - Dataset & EDA (Task 1.1): data loading, EDA, caption cleaning, split, preprocessing, DataLoaders.
-- **Member 2** - CNN from scratch (Task 1.2): encoder architecture, training/validation loops, tracking, tuning, curves.
-- **Member 3** - Transfer learning & evaluation (Task 1.2): ResNet-18/EfficientNet-B0, metrics, Grad-CAM, comparison, benchmark.
+- **Member 1, Youssef Mohamed Abboud (23P0062)** - Dataset & EDA (Task 1.1): data loading, EDA, caption cleaning, split, preprocessing, DataLoaders.
+- **Member 2, Youssef Mohamed ElSayed (23P0215)** - CNN from scratch (Task 1.2): encoder architecture, training/validation loops, tracking, tuning, curves.
+- **Member 3, Mohamed Ahmed Eissa (23P0143)** - Transfer learning & evaluation (Task 1.2): ResNet-18/EfficientNet-B0, metrics, Grad-CAM, comparison, benchmark.
