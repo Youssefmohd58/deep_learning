@@ -185,5 +185,5 @@ new encoder can be swapped in without changing the training loop (spec 5.2).
 ## 7. Team
 
 - **Member 1, Youssef Mohamed Abboud (23P0062)** - Dataset & EDA (Task 1.1): data loading, EDA, caption cleaning, split, preprocessing, DataLoaders.
-- **Member 2, Youssef Mohamed ElSayed (23P0215)** - CNN from scratch (Task 1.2): encoder architecture, training/validation loops, tracking, tuning, curves.
-- **Member 3, Mohamed Ahmed Eissa (23P0143)** - Transfer learning & evaluation (Task 1.2): ResNet-18/EfficientNet-B0, metrics, Grad-CAM, comparison, benchmark.
+- **Member 2, Mohamed Ahmed Eissa (23P0143)** - CNN from scratch (Task 1.2): encoder architecture, training/validation loops, tracking, tuning, curves.
+- **Member 3, Youssef Mohamed ElSayed (23P0215)** - Transfer learning & evaluation (Task 1.2): ResNet-18/EfficientNet-B0, metrics, Grad-CAM, comparison, benchmark.
