@@ -1,0 +1,6 @@
+architecture: resnet18
+found_by: random
+best_val_accuracy: 0.4286905754795663
+training:
+  head_lr: 0.0032793390758944258
+  weight_decay: 1.8231252158663002e-06

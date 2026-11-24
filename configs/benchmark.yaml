@@ -15,7 +15,7 @@ published:
   - model: Bilinear CNN (B-CNN)
     accuracy: 0.841
     backbone: two VGG networks, ImageNet-pretrained, outer-product pooling
-    input_size: null           # not checked; read it from the paper before citing
+    input_size: 448           
     extra_annotations: false
     source: Lin, RoyChowdhury & Maji, "Bilinear CNN Models for Fine-grained Visual Recognition", ICCV 2015
     url: https://arxiv.org/abs/1504.07889
